@@ -9,30 +9,43 @@
     </style>
 </head>
 <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="nickname" placeholder="Enter your nickname" autocomplete="off" required />
-        <input id="input" placeholder="Type your message" autocomplete="off" required />
-        <button>Send</button>
-    </form>
+    <div id="app">
+        <ul id="messages">
+            <li v-for="msg in messages">{{ msg.nickname }}: {{ msg.message }}</li>
+        </ul>
+        <form id="form" @submit.prevent="sendMessage">
+            <input id="nickname" v-model="nickname" placeholder="Enter your nickname" autocomplete="off" required />
+            <input id="input" v-model="message" placeholder="Type your message" autocomplete="off" required />
+            <button type="submit">Send</button>
+        </form>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(function () {
-            var socket = io();
+        new Vue({
+            el: '#app',
+            data: {
+                nickname: '',
+                message: '',
+                messages: []
+            },
+            created() {
+                var socket = io();
 
-            $('#form').submit(function() {
-                var nickname = $('#nickname').val();
-                var message = $('#input').val();
-                socket.emit('chat message', { nickname: nickname, message: message });
-                $('#input').val('');
-                return false;
-            });
+                socket.on('chat message', (msg) => {
+                    this.messages.push(msg);
+                });
 
-            socket.on('chat message', function(msg) {
-                $('#messages').append($('<li>').text(msg.nickname + ': ' + msg.message));
-            });
+                this.socket = socket;
+            },
+            methods: {
+                sendMessage() {
+                    this.socket.emit('chat message', { nickname: this.nickname, message: this.message });
+                    this.message = '';
+                }
+            }
         });
     </script>
 </body>
