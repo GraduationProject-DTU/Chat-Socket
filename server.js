@@ -14,7 +14,6 @@ const io = socketio(server);
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Lắng nghe sự kiện chat
   socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
     io.emit('chat message', msg);
