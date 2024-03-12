@@ -94,7 +94,7 @@
         </ul>
         <div class="chat-input">
             <input type="text" v-model="nickname" placeholder="Enter your nickname" autocomplete="off">
-            <input type="text" v-model="message" placeholder="Type your message" autocomplete="off">
+            <input @keyup.enter="sendMessage" type="text" v-model="message" placeholder="Type your message" autocomplete="off">
             <button @click="sendMessage">Send</button>
         </div>
     </div>
@@ -117,6 +117,10 @@
                     this.messages.push(msg);
                 });
 
+                socket.on('message deleted', (index) => {
+                    this.messages.splice(index, 1);
+                });
+
                 this.socket = socket;
             },
             methods: {
@@ -133,7 +137,8 @@
                     this.message = '';
                 },
                 deleteMessage(index) {
-                    this.messages.splice(index, 1);
+                    console.log(1)
+                    this.socket.emit('delete message', index);
                 }
             }
         });

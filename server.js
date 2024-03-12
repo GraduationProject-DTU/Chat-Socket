@@ -19,6 +19,12 @@ io.on('connection', (socket) => {
     io.emit('chat message', msg);
   });
 
+  io.on('connection', (socket) => {
+    socket.on('delete message', (index) => {
+        io.emit('message deleted', index);
+    });
+});
+
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
